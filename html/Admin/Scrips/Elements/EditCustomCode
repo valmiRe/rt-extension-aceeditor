@@ -54,8 +54,9 @@
 <i><&|/l&>(Use these fields when you choose 'User Defined' for a condition or action)</&></i>
 </td></tr>
 
-% foreach my $method (keys %list){
-%   my $desc = $list{$method};
+% for (my $i=0; $i <= $#list; $i+=2) {
+%   my $method = $list[$i];
+%   my $desc = $list[$i+1];
 <tr><td class="labeltop"><% $desc %>:</td><td class="value">
 % my $code = $ARGS{ $method } || $Scrip->$method() || '';
 %   if (RT->Config->Get('AceEditorScripsEnable')){
@@ -71,7 +72,9 @@
 </table>
 % if (RT->Config->Get('AceEditorScripsEnable')){
 <script>
-%   foreach my $method (keys %list){
+% for (my $i=0; $i <= $#list; $i+=2) {
+%   my $method = $list[$i];
+
 var editor_<% $method %> = ace.edit("editor-<% $method %>");
     editor_<% $method %>.setTheme("ace/theme/<%  RT->Config->Get('AceEditorTheme') %>");
     editor_<% $method %>.getSession().setMode("ace/mode/<%  RT->Config->Get('AceEditorScripsMode') %>");
@@ -80,9 +83,11 @@ var editor_<% $method %> = ace.edit("editor-<% $method %>");
     editor_<% $method %>.setOption("maxLines", <%  RT->Config->Get('AceEditorMaxLines') %>);
     editor_<% $method %>.setOption("minLines", <%  RT->Config->Get('AceEditorMinLines') %>);
 %   }
+
 var form = document.getElementById('ModifyScrip');
 form.onsubmit = function(){
-%   foreach my $method (keys %list){
+% for (my $i=0; $i <= $#list; $i+=2) {
+%   my $method = $list[$i];
 form.elements["<% $method %>"].value = editor_<% $method %>.getValue();
 %   }
 }
@@ -93,7 +98,7 @@ form.elements["<% $method %>"].value = editor_<% $method %>.getValue();
 $Scrip
 </%ARGS>
 <%INIT>
-my %list = (
+my @list = (
     CustomIsApplicableCode => loc('Custom condition'),
     CustomPrepareCode      => loc('Custom action preparation code'),
     CustomCommitCode       => loc('Custom action commit code'),
